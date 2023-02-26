@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from decimal import Decimal
 import pandas as pd
+pd.options.display.max_rows = 1000
+pd.options.display.max_rows = 1000
 
 # DATA CLASSES
 
@@ -51,7 +53,11 @@ class EntriesReader(ABC):
     def entries_by_account(self):
         entries = {}
         for entry in self.all_entries():
-            entries[entry.bank_id] = entries.get(entry.bank_id, []) + [entry]
+            if entry.bank_id != None:
+                entries[entry.bank_id] = entries.get(entry.bank_id, []) + [entry]
+            else:
+                entries["unknown"] = entries.get("unknown", []) + [entry]
+
         return entries
 
     def total_transactions(self):
@@ -65,3 +71,8 @@ class EntriesReader(ABC):
         for entry in self.all_entries():
             data.append(vars(entry))
         return pd.DataFrame(data)
+
+
+
+
+
