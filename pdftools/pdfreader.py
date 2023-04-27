@@ -1,6 +1,6 @@
 import string
 import unicodedata
-import PyPDF2
+import pypdf
 import pdfplumber
 
 
@@ -28,12 +28,12 @@ class PDFreader:
     def _read_with_pypdf2(self, pdf_path):
         pdfFileObj = open(pdf_path, 'rb')
         # creating a pdf reader object
-        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+        pdf_reader = pypdf.PdfReader(pdfFileObj)
         pages = []
-        for page in range(0, pdfReader.numPages):
-            pageObj = pdfReader.getPage(page)
+        for page in range(0, len(pdf_reader.pages)):
+            pageObj = pdf_reader.pages[page]
             # extracting text from page
-            pagetxt = pageObj.extractText()
+            pagetxt = pageObj.extract_text()
             pages.append(pagetxt)
         return '\n'.join(pages)
 

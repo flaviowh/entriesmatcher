@@ -1,7 +1,8 @@
 import datetime
 from decimal import Decimal
+from typing import List
 import openpyxl
-from models import SheetEntry, EntriesReader
+from base import SheetEntry, EntriesReader
 
 MAX_COL = 8
 EXCEL_OFFSET = 1
@@ -18,7 +19,7 @@ class SheetReader(EntriesReader):
     def __init__(self, sheet_path):
         self.wb = openpyxl.load_workbook(sheet_path)
 
-    def all_entries(self):
+    def all_entries(self) -> List[SheetEntry]:
         entries = []
         try:
             entries += self.get_entries(self.wb.get_sheet_by_name(PAYMENT), True)
@@ -29,7 +30,7 @@ class SheetReader(EntriesReader):
 
         return entries
 
-    def get_entries(self, ws, is_payment):
+    def get_entries(self, ws, is_payment) -> List[SheetEntry]:
         entries = []
         start = self.find_first_row()
         for row in range(start, ws.max_row + EXCEL_OFFSET):

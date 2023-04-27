@@ -1,7 +1,7 @@
 
-from ofxreader import OFXReader
+from typing import List
 from sheetreader import SheetReader
-from models import *
+from base import EntriesReader, FullEntry
 
 
 class EntriesMatcher(EntriesReader):
@@ -10,9 +10,9 @@ class EntriesMatcher(EntriesReader):
         self.sheetreader = sheetreader
 
     def all_entries(self):
-        return self.matched_entries()   
+        return self.match_entries()   
     
-    def matched_entries(self):
+    def match_entries(self) -> List[FullEntry]:
         entries = []
         matches = 0
         statement_entries = self.ofxreader.entries_by_account()

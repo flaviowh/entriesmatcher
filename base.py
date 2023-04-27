@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from decimal import Decimal
+from typing import Dict, List
 import pandas as pd
 pd.options.display.max_rows = 1000
 pd.options.display.max_rows = 1000
@@ -47,11 +48,11 @@ class FullEntry(Entry):
 
 class EntriesReader(ABC):
     @abstractmethod
-    def all_entries(self):
+    def all_entries(self) -> List[Entry]:
         pass
     
-    def entries_by_account(self):
-        entries = {}
+    def entries_by_account(self) -> Dict[str, List[Entry]]:
+        entries : Dict[str, List[Entry]] = {}
         for entry in self.all_entries():
             if entry.bank_id != None:
                 entries[entry.bank_id] = entries.get(entry.bank_id, []) + [entry]
@@ -60,13 +61,13 @@ class EntriesReader(ABC):
 
         return entries
 
-    def total_transactions(self):
-        total = 0
+    def total_transactions(self) -> Decimal:
+        total = Decimal("0")
         for entry in self.all_entries():
             total += entry.value
         return total
 
-    def to_dataframe(self):
+    def to_dataframe(self) -> pd.DataFrame:
         data = []
         for entry in self.all_entries():
             data.append(vars(entry))
