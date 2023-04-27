@@ -12,9 +12,9 @@ env.read_env()  # new
 
 # PATHS
 DESKTOP = os.path.join(os.path.expanduser('~'), 'Desktop')
-bb_pdf = rf"{DESKTOP}\work\demonstração\study\EXTRATO BB 01-2023 PDF (01-02-2023).pdf"
+bb_pdf = rf"{DESKTOP}\work\demonstração\study\EXTRATO BB 01-2023.pdf"
 bb_pdf2 = rf"{DESKTOP}\work\demonstração\01-2022\EXTRATO - JANEIRO-22.pdf"
-bb_ofx = rf"{DESKTOP}\Work\demonstração\study\EXTRATO BB 01-2023 OFX (01-02-2023).ofx"
+bb_ofx = rf"{DESKTOP}\Work\demonstração\study\EXTRATO BB 01-2023.ofx"
 
 
 # TEST PARSERS

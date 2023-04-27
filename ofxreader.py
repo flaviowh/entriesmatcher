@@ -52,7 +52,7 @@ class OFXStatement(EntriesReader):
         with open(edited_file_path, 'w') as edited:
             for i, line in enumerate(lines):
                 if line.startswith(f"<{second_field}>") and lines[i - 1].startswith(f"<{first_field}>"):
-                    continue
+                    continue    
                 elif line.startswith(f"<{first_field}>"):
                     if lines[i + 1].startswith(f"<{second_field}>"):
                         edited.write(lines[i + 1])
