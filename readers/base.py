@@ -78,8 +78,3 @@ class EntriesReader(ABC):
         return pd.DataFrame(data)
 
 
-
-# a = StatementEntry("01/01/2020", "dodo", Decimal("100"), "01")
-# b = SheetEntry("01/01/2020", "dodo", Decimal("100"),"dada", "01")
-
-# print(a == b)

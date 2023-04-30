@@ -7,7 +7,7 @@ import pdfplumber
 class PDFreader:
     def read(self, pdf_path):
         if pdf_path.endswith(".pdf"):
-            text = self._read_with_pypdf2(pdf_path)
+            text = self._read_with_pypdf(pdf_path)
             if self.is_valid(text):
                 return text
             else:
@@ -25,7 +25,7 @@ class PDFreader:
             text = '\n'.join(pages)
         return text
 
-    def _read_with_pypdf2(self, pdf_path):
+    def _read_with_pypdf(self, pdf_path):
         pdfFileObj = open(pdf_path, 'rb')
         # creating a pdf reader object
         pdf_reader = pypdf.PdfReader(pdfFileObj)
