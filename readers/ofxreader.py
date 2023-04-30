@@ -6,23 +6,21 @@ import os
 from base import StatementEntry, EntriesReader
 
 
-
 class OFXStatement(EntriesReader):
     def __init__(self, ofx_path):
         parser = OFXTree()
         try:
-            self.tree = parser.parse(ofx_path) 
-            self.ofx = parser.convert() 
+            self.tree = parser.parse(ofx_path)
+            self.ofx = parser.convert()
         except Exception as error_msg:
             if str(error_msg).startswith("Elements out of order"):
                 print("yes")
                 fixed_file = self.reorder_ofx_fields(error_msg, ofx_path)
                 self.tree = parser.parse(fixed_file)
-                self.ofx = parser.convert()  
+                self.ofx = parser.convert()
             else:
                 raise Exception(str(error_msg))
 
-        
         self.start_date = self.ofx.statements[0].dtstart
         self.end_date = self.ofx.statements[0].dtend
         self.acc_id = self.ofx.statements[0].acctid
@@ -37,22 +35,22 @@ class OFXStatement(EntriesReader):
             new_entry = StatementEntry(
                 date=trans.dtposted.strftime(
                     "%d/%m/%Y"),
-                history= history,
+                history=history,
                 value=trans.trnamt,
                 bank_id=self.acc_id)
             entries.append(new_entry)
         return entries
 
-    def reorder_ofx_fields(self, error_msg, ofx_path) -> str :
+    def reorder_ofx_fields(self, error_msg, ofx_path) -> str:
         pattern = r'(?<=STMTTRN, )\w+|(?<=occur before )\w+'
-        second_field , first_field = re.findall(pattern, str(error_msg))
+        second_field, first_field = re.findall(pattern, str(error_msg))
 
         lines = open(ofx_path, 'r').readlines()
         edited_file_path = ofx_path.replace(".ofx", "fixed .ofx")
         with open(edited_file_path, 'w') as edited:
             for i, line in enumerate(lines):
                 if line.startswith(f"<{second_field}>") and lines[i - 1].startswith(f"<{first_field}>"):
-                    continue    
+                    continue
                 elif line.startswith(f"<{first_field}>"):
                     if lines[i + 1].startswith(f"<{second_field}>"):
                         edited.write(lines[i + 1])

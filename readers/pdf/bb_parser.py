@@ -3,7 +3,7 @@ import sys
 import os
 # Add the parent directory of the current script to the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
-from base import EntriesReader, StatementEntry
+from ..base import EntriesReader, StatementEntry
 
 import re
 from typing import List

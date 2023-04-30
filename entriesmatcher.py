@@ -1,22 +1,25 @@
 
-from typing import List
-from sheetreader import SheetReader
-from base import EntriesReader, FullEntry
+from typing import Dict, List, Tuple
+from .db_interface import AccountsInfo
+from .readers.sheetreader import SheetReader
+from .readers.base import EntriesReader, EntryType, FullEntry, SheetEntry
 
 
 class EntriesMatcher(EntriesReader):
-    def __init__(self, ofxreader: EntriesReader, sheetreader: SheetReader):
-        self.ofxreader = ofxreader
-        self.sheetreader = sheetreader
+    def __init__(self, statement_reader: EntriesReader, sheet_reader: SheetReader, accounts_keeper: AccountsInfo):
+        self.statement_reader = statement_reader
+        self.sheet_reader = sheet_reader
+        self.accounts_keeper = accounts_keeper
+        self.match_count = 0
 
     def all_entries(self):
-        return self.match_entries()   
-    
+        return self.match_entries()
+
     def match_entries(self) -> List[FullEntry]:
         entries = []
-        matches = 0
-        statement_entries = self.ofxreader.entries_by_account()
-        sheet_entries = self.sheetreader.entries_by_account()
+
+        statement_entries = self.statement_reader.entries_by_account()
+        self.sheet_entries = self.sheet_reader.entries_by_account()
 
         for acc_id in statement_entries.keys():
             for stm_entry in statement_entries[acc_id]:
@@ -24,29 +27,33 @@ class EntriesMatcher(EntriesReader):
                 date = stm_entry.date
                 history = stm_entry.history
 
-                for sht_entry in sheet_entries[self.matched_acc(acc_id)]:
-                    if stm_entry == sht_entry:
-                        history = f"{history} - {sht_entry.history}"
-                        matches += 1
+                for sht_entry in self.sheet_entries[acc_id]:
+                    if stm_entry == sht_entry and not sht_entry.matched:
+                        history = f"{history} - {sht_entry.history} {sht_entry.description}"
+                        self.match_count += 1
+                        sht_entry.matched = True
                         break
+                if value > 0:
+                    debit = self.accounts_keeper.get_bank_account(acc_id)    
+                    credit, db_hist = self.accounts_keeper.get_credit_account_and_history(history)
+                else:
+                    debit, db_hist = self.accounts_keeper.get_debit_account_and_history(history)   
+                    credit = self.accounts_keeper.get_bank_account(acc_id)   
 
-                credit = self.get_account(
-                        acc_id) if value < 0 else self.get_account(history)
-                debit = self.get_account(
-                        acc_id) if value > 0 else self.get_account(history)
+                history = f"{db_hist} {history}".strip()
                 entries.append(
-                            FullEntry(date=date, history=history, value=value, credit=credit, debit=debit))    
-                    
+                    FullEntry(date=date, history=history, value=value, credit=credit, debit=debit))
 
         return entries
-    
 
-    def matched_acc(self, val):
-        return val
+    @property
+    def unmatched_entries(self) -> List[SheetEntry]:
+        unmatched : List[SheetEntry] = []
+        if not self.sheet_entries:
+            return unmatched
 
-    def get_account(self, history):
-        return 259
-
-    def get_bank(self, bank_id):
-        return 2
-    
+        for entries in self.sheet_entries.values():
+            for e in entries:
+                if not e.matched:
+                    unmatched.append(e)
+        return unmatched

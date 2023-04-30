@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 from typing import List
 import openpyxl
-from base import SheetEntry, EntriesReader
+from .base import SheetEntry, EntriesReader
 
 MAX_COL = 8
 EXCEL_OFFSET = 1
@@ -26,7 +26,7 @@ class SheetReader(EntriesReader):
             entries += self.get_entries(self.wb.get_sheet_by_name(DEPOSIT), False)
         except Exception:
             print("couldn't separate deposits from payments")
-            entries += self.get_entries(self.wb.active)
+            entries += self.get_entries(self.wb.active, None)
 
         return entries
 
